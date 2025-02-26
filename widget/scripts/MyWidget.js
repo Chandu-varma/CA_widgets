@@ -1,4 +1,4 @@
-define("DS/PartViewWidgetDev/scripts/MyWidget", [], function (
+define("DS/CA_widgets/scripts/MyWidget", [], function (
 ) {
     'use strict';
 
