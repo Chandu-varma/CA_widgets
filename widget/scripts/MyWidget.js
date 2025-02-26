@@ -29,5 +29,5 @@ define("DS/CA_widgets/scripts/MyWidget", [], function (
         },
     };
 
-    myWidget.addEvent('onLoad', myWidget.onLoad);
+    myWidget.addEvent("onLoad", myWidget.onLoad);
 });
