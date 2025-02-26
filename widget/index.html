@@ -5,7 +5,7 @@
 <head>
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=add" />
-
+    <script rel="scripts/MyWidget.js"></script>
     <widget:preferences>
         <widget:preference name="AA" type="list" label="Operation" defaultValue="select">
             <widget:option label="NFirst" value="NFirst"></widget:option>
@@ -20,13 +20,14 @@
     </widget:preferences>
     <script>
         require(["DS/CA_widgets/scripts/MyWidget"], function (mywidget) {
-            widget.addEvent("onLoad", mywidget.onLoadwidget);
+            widget.addEvent("onLoad", mywidget.onLoad);
         });
     </script>
 </head>
 
 <body>
     <p>index.html loading</p>
+    <h1 id="123"></h1>
 </body>
 
 </html>
