@@ -5,7 +5,11 @@
 <head>
     <link rel="stylesheet" type="text/stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=add" />
-
+    <script>
+        require(["DS/widgets/scripts/MyWidget"], function (myWidget) {
+            widget.addEvent("onLoad", myWidget.onLoadWidget);
+        });
+    </script>
     <widget:preferences>
         <widget:preference name="AA" type="list" label="Operation" defaultValue="select">
             <widget:option label="NFirst" value="NFirst"></widget:option>
@@ -18,11 +22,6 @@
         <widget:preference name="DD" type="range" label="rangeInput" defaultValue="Docume"></widget:preference>
 
     </widget:preferences>
-    <script>
-        require(["DS/CA_widgets/scripts/MyWidget"], function (myWidget) {
-            widget.addEvent("onLoad", myWidget.onLoadWidget);
-        });
-    </script>
 </head>
 
 <body>

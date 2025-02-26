@@ -1,4 +1,4 @@
-define("DS/CA_widgets/scripts/MyWidget", [], function (
+define("DS/widgets/scripts/MyWidget", [], function (
 ) {
     'use strict';
 
@@ -28,6 +28,6 @@ define("DS/CA_widgets/scripts/MyWidget", [], function (
 
         },
     };
-    return myWidget;
-    // myWidget.addEvent("onLoad", myWidget.onLoadWidget);
+    //return myWidget;
+    myWidget.addEvent("onLoad", myWidget.onLoadWidget);
 });
