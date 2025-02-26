@@ -3,10 +3,8 @@ define("DS/CA_widgets/scripts/MyWidget", [], function (
     'use strict';
 
     var myWidget = {
-        html: function () {
-            document.getElementById("123").innerHTML = `hiiii this is js file`;
-        },
-        onLoad: function () {
+
+        onLoadWidget: function () {
             // Creating HTML content with form-like structure
             widget.body.innerHTML = "<div class='main-Container' id='mainContainer' style='width: 100%; height: 100%; text-align: center; background-color:#005685; color: #ffffff; padding: 40px'>" +
                 "<h1>Drag and Drop Data</h1>" +
