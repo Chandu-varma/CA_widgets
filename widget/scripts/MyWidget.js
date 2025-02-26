@@ -28,6 +28,6 @@ define("DS/CA_widgets/scripts/MyWidget", [], function (
 
         },
     };
-
-    myWidget.addEvent("onLoad", myWidget.onLoadWidget);
+    return myWidget;
+    // myWidget.addEvent("onLoad", myWidget.onLoadWidget);
 });
