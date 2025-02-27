@@ -12,6 +12,12 @@ define("DS/widget/scripts/MyWidget", [], function () {
                 "<button id='returnBtn' style='margin-top: 20px; padding: 10px 20px; background-color: #005685; color: #fff; border: none; border-radius: 5px; cursor: pointer;'>Return to Drop Area</button>" +
                 "</div>" +
                 "</div>";
+            widget.addEvent("onLoad", page1.table);
+        },
+        table: function () {
+            fetch('html/table.html').then(data => data.text()).then((html) => {
+                document.getElementById('mainContainer').innerHTML = html;
+            })
         }
 
     }
