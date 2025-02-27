@@ -8,8 +8,11 @@
 
 
     <script>
-        require(["DS/CA_widgets/widget/scripts/MyWidget"], function (mywidget) {
+        console.log("::::::before:::::")
+        require(["DS/widget/scripts/MyWidget"], function (mywidget) {
+            console.log("::::::mid:::::")
             widget.addEvent("onLoad", mywidget.onLoadWidget);
+            console.log("::::::after:::::")
         });
     </script>
     <widget:preferences>
