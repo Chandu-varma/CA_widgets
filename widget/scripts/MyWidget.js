@@ -1,4 +1,4 @@
-define('DS/MyWidget/scripts/MyWidget', [], function () {
+define('DS/Widget/scripts/MyWidget', [], function () {
     'use strict';
 
     var page1 = {
