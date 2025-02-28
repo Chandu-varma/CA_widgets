@@ -1,13 +1,12 @@
 define([
-    "DS/widget/scripts/TableWidget",
-    "DS/DataDragAndDrop/DataDragAndDrop",
     "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-], function (tableModule, dragDrop) {
+], function () {
     'use strict';
 
     var page1 = {
         selectedLat: null,
         selectedLng: null,
+        radiusKm: 1, // Default radius (1 km)
 
         onLoad: function () {
             if (typeof L === "undefined") {
@@ -19,35 +18,37 @@ define([
                 <div class="main-Container" id="mainContainer" 
                     style="width: 100%; height: 100%; text-align: center; background-color:#005685; color: #ffffff; padding: 40px">
                     
-                    <h1>Traffic Data Viewer</h1>
-                    
+                    <h1>Radius Coordinates Viewer</h1>
+
                     <button id="loadMapBtn">Load Map</button>
-                    <button id="getTrafficDataBtn" disabled>Get Traffic Data</button>
 
                     <div id="mapContainer" style="margin-top: 20px; display: none;">
                         <h2>Select a Location</h2>
                         <div id="map" style="height: 400px; width: 100%;"></div>
                         <p id="coordinates">Click on the map to select a location.</p>
+
+                        <label for="radiusInput">Set Radius (km): </label>
+                        <input type="number" id="radiusInput" value="1" min="0.1" step="0.1">
+                        <button id="updateRadiusBtn">Update Radius</button>
                     </div>
 
-                    <div id="trafficTableContainer" style="margin-top: 20px; display: none;">
-                        <h2>Traffic Data</h2>
+                    <div id="coordsTableContainer" style="margin-top: 20px; display: none;">
+                        <h2>Radius Coordinates</h2>
                         <table border="1" style="width: 100%; text-align: left;">
                             <thead>
                                 <tr>
-                                    <th>Speed (KMPH)</th>
-                                    <th>Free Flow Speed (KMPH)</th>
-                                    <th>Current Travel Time (Sec)</th>
-                                    <th>Free Flow Travel Time (Sec)</th>
+                                    <th>Point</th>
+                                    <th>Latitude</th>
+                                    <th>Longitude</th>
                                 </tr>
                             </thead>
-                            <tbody id="trafficData"></tbody>
+                            <tbody id="coordsData"></tbody>
                         </table>
                     </div>
                 </div>`;
 
             document.getElementById("loadMapBtn").addEventListener("click", page1.loadMap);
-            document.getElementById("getTrafficDataBtn").addEventListener("click", page1.getTrafficData);
+            document.getElementById("updateRadiusBtn").addEventListener("click", page1.updateRadius);
         },
 
         loadMap: function () {
@@ -61,42 +62,67 @@ define([
             }).addTo(map);
 
             var marker = L.marker(defaultLocation, { draggable: true }).addTo(map);
+            var circle = L.circle(defaultLocation, { radius: page1.radiusKm * 1000 }).addTo(map);
             page1.selectedLat = defaultLocation[0];
             page1.selectedLng = defaultLocation[1];
-            document.getElementById("getTrafficDataBtn").disabled = false;
+
+            document.getElementById("coordinates").innerText = `Latitude: ${page1.selectedLat}, Longitude: ${page1.selectedLng}`;
+            document.getElementById("coordsTableContainer").style.display = "block";
+            page1.updateTable();
 
             map.on('click', function (event) {
                 marker.setLatLng(event.latlng);
+                circle.setLatLng(event.latlng);
                 page1.selectedLat = event.latlng.lat;
                 page1.selectedLng = event.latlng.lng;
                 document.getElementById("coordinates").innerText = `Latitude: ${page1.selectedLat}, Longitude: ${page1.selectedLng}`;
+                page1.updateTable();
             });
         },
 
-        getTrafficData: function () {
-            var apiKey = "e7TPeERXJGg5odC4yjsQ9CflXKbcn";
-            var url = `https://api.tomtom.com/traffic/services/4/flowSegmentData/relative0/10/json?point=${page1.selectedLat},${page1.selectedLng}&unit=KMPH&openLr=false&key=${apiKey}`;
+        updateRadius: function () {
+            var newRadius = parseFloat(document.getElementById("radiusInput").value);
+            if (newRadius > 0) {
+                page1.radiusKm = newRadius;
+                page1.updateTable();
+            } else {
+                alert("Please enter a valid radius greater than 0.");
+            }
+        },
 
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.flowSegmentData) {
-                        var trafficInfo = data.flowSegmentData;
-                        var tableRow = `
-                            <tr>
-                                <td>${trafficInfo.currentSpeed}</td>
-                                <td>${trafficInfo.freeFlowSpeed}</td>
-                                <td>${trafficInfo.currentTravelTime}</td>
-                                <td>${trafficInfo.freeFlowTravelTime}</td>
-                            </tr>`;
+        updateTable: function () {
+            var numPoints = 8; // Number of points around the circle
+            var radiusMeters = page1.radiusKm * 1000;
+            var coordsTable = document.getElementById("coordsData");
+            coordsTable.innerHTML = "";
 
-                        document.getElementById("trafficData").innerHTML = tableRow;
-                        document.getElementById("trafficTableContainer").style.display = "block";
-                    } else {
-                        alert("No traffic data available for this location.");
-                    }
-                })
-                .catch(error => console.error("Error fetching traffic data:", error));
+            for (var i = 0; i < numPoints; i++) {
+                var angle = (i * 360) / numPoints; // Evenly distribute around circle
+                var newCoords = page1.computeOffset(page1.selectedLat, page1.selectedLng, radiusMeters, angle);
+                coordsTable.innerHTML += `<tr><td>Point ${i + 1}</td><td>${newCoords.lat}</td><td>${newCoords.lng}</td></tr>`;
+            }
+        },
+
+        computeOffset: function (lat, lng, distance, angle) {
+            var R = 6378137; // Earth's radius in meters
+            var dRad = distance / R;
+            var latRad = (lat * Math.PI) / 180;
+            var lngRad = (lng * Math.PI) / 180;
+            var angleRad = (angle * Math.PI) / 180;
+
+            var newLat = Math.asin(
+                Math.sin(latRad) * Math.cos(dRad) +
+                Math.cos(latRad) * Math.sin(dRad) * Math.cos(angleRad)
+            );
+            var newLng = lngRad + Math.atan2(
+                Math.sin(angleRad) * Math.sin(dRad) * Math.cos(latRad),
+                Math.cos(dRad) - Math.sin(latRad) * Math.sin(newLat)
+            );
+
+            return {
+                lat: (newLat * 180) / Math.PI,
+                lng: (newLng * 180) / Math.PI
+            };
         }
     };
 
