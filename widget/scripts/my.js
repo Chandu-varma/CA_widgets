@@ -8,6 +8,7 @@ define(["https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"], function () {
         selectedLng: null,
         radiusKm: 1, // Default radius
         apiKey: "", // API Key Placeholder
+        mode: "pointer", // Default mode
 
         onLoad: function () {
             if (typeof L === "undefined") {
@@ -25,8 +26,12 @@ define(["https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"], function () {
                     <!-- Right: Controls & Table -->
                     <div id="controls" style="flex: 1; padding: 20px; background: #f4f4f4; overflow-y: auto;">
                         <h2>Traffic Data Viewer</h2>
-                        <label>Enter Location: <input type="text" id="locationInput" placeholder="City, Address..."></label>
-                        <button id="searchLocation">Search</button>
+                        <label>Select Mode:</label>
+                        <button id="modePointer">Select by Pointer</button>
+                        <button id="modeText">Select by Text</button>
+                        <br><br>
+                        <label>Enter Location: <input type="text" id="locationInput" placeholder="City, Address..." disabled></label>
+                        <button id="searchLocation" disabled>Search</button>
                         <br><br>
                         <label>API Key: <input type="text" id="apiKeyInput" placeholder="Enter API Key"></label>
                         <br><br>
@@ -50,6 +55,17 @@ define(["https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"], function () {
 
             page1.initMap();
 
+            document.getElementById("modePointer").addEventListener("click", function () {
+                page1.mode = "pointer";
+                document.getElementById("locationInput").disabled = true;
+                document.getElementById("searchLocation").disabled = true;
+            });
+            document.getElementById("modeText").addEventListener("click", function () {
+                page1.mode = "text";
+                document.getElementById("locationInput").disabled = false;
+                document.getElementById("searchLocation").disabled = false;
+            });
+
             document.getElementById("searchLocation").addEventListener("click", page1.searchLocation);
             document.getElementById("getTrafficData").addEventListener("click", page1.getTrafficData);
         },
@@ -59,9 +75,11 @@ define(["https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"], function () {
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(page1.map);
 
             page1.map.on('click', function (e) {
-                page1.selectedLat = e.latlng.lat;
-                page1.selectedLng = e.latlng.lng;
-                page1.updateMarker();
+                if (page1.mode === "pointer") {
+                    page1.selectedLat = e.latlng.lat;
+                    page1.selectedLng = e.latlng.lng;
+                    page1.updateMarker();
+                }
             });
         },
 
@@ -71,6 +89,7 @@ define(["https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"], function () {
         },
 
         searchLocation: function () {
+            if (page1.mode !== "text") return;
             var location = document.getElementById("locationInput").value;
             if (!location) {
                 alert("Please enter a location.");
