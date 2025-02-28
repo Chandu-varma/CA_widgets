@@ -60,47 +60,50 @@ define("DS/widget/scripts/my", [
             var mapContainer = document.getElementById("mapContainer");
             mapContainer.style.display = "block"; // Show the map container
 
-            // Initialize Google Maps
-            var defaultLocation = { lat: 17.3850, lng: 78.4867 }; // Default: Hyderabad
-            var map = new google.maps.Map(document.getElementById("map"), {
-                center: defaultLocation,
-                zoom: 15,
-            });
-
-            // Marker
-            var marker = new google.maps.Marker({
-                position: defaultLocation,
-                map: map,
-                draggable: true,
-            });
-
-            // Circle for 500m radius
-            var circle = new google.maps.Circle({
-                map: map,
-                radius: 500,
-                fillColor: "#AA0000",
-                fillOpacity: 0.2,
-                strokeWeight: 2,
-            });
-
-            circle.bindTo("center", marker, "position");
-
-            function updateCoordinates(position) {
-                var lat = position.lat();
-                var lng = position.lng();
-                document.getElementById("coordinates").innerHTML = `Latitude: ${lat.toFixed(6)}, Longitude: ${lng.toFixed(6)}`;
+            // Check if Leaflet is loaded
+            if (typeof L === "undefined") {
+                alert("Leaflet.js is not loaded. Please check your internet connection.");
+                return;
             }
 
-            google.maps.event.addListener(marker, "dragend", function () {
-                updateCoordinates(marker.getPosition());
+            // Initialize Leaflet map
+            var defaultLocation = [17.3850, 78.4867]; // Default: Hyderabad
+            var map = L.map('map').setView(defaultLocation, 15);
+
+            // Load OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Marker
+            var marker = L.marker(defaultLocation, { draggable: true }).addTo(map);
+
+            // Circle for 500m radius
+            var circle = L.circle(defaultLocation, {
+                color: 'red',
+                fillColor: '#f03',
+                fillOpacity: 0.2,
+                radius: 500
+            }).addTo(map);
+
+            function updateCoordinates(latlng) {
+                var lat = latlng.lat.toFixed(6);
+                var lng = latlng.lng.toFixed(6);
+                document.getElementById("coordinates").innerHTML = `Latitude: ${lat}, Longitude: ${lng}`;
+
+                marker.setLatLng(latlng);
+                circle.setLatLng(latlng);
+            }
+
+            marker.on('dragend', function (event) {
+                updateCoordinates(event.target.getLatLng());
             });
 
-            google.maps.event.addListener(map, "click", function (event) {
-                marker.setPosition(event.latLng);
-                updateCoordinates(event.latLng);
+            map.on('click', function (event) {
+                updateCoordinates(event.latlng);
             });
 
-            updateCoordinates(marker.getPosition());
+            updateCoordinates(marker.getLatLng());
         }
     };
 
