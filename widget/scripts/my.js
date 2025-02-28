@@ -1,12 +1,13 @@
-define([
-    "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-], function () {
+define(["https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"], function () {
     'use strict';
 
     var page1 = {
+        map: null,
+        marker: null,
         selectedLat: null,
         selectedLng: null,
-        radiusKm: 1, // Default radius (1 km)
+        radiusKm: 1, // Default radius
+        apiKey: "", // API Key Placeholder
 
         onLoad: function () {
             if (typeof L === "undefined") {
@@ -15,116 +16,108 @@ define([
             }
 
             widget.body.innerHTML = `
-                <div class="main-Container" id="mainContainer" 
-                    style="width: 100%; height: 100%; text-align: center; background-color:#005685; color: #ffffff; padding: 20px; overflow: auto; max-height: 100vh;">
-                    
-                    <h1>Radius Coordinates Viewer</h1>
-
-                    <button id="loadMapBtn">Load Map</button>
-
-                    <div id="mapContainer" style="margin-top: 20px; display: none; overflow: hidden;">
-                        <h2>Select a Location</h2>
-                        <div id="map" style="height: 400px; width: 100%; max-width: 800px; margin: auto;"></div>
-                        <p id="coordinates">Click on the map to select a location.</p>
-
-                        <label for="radiusInput">Set Radius (km): </label>
-                        <input type="number" id="radiusInput" value="1" min="0.1" step="0.1">
-                        <button id="updateRadiusBtn">Update Radius</button>
+                <div style="display: flex; height: 100vh;">
+                    <!-- Left: Map View -->
+                    <div id="mapContainer" style="flex: 2; height: 100%;">
+                        <div id="map" style="height: 100%;"></div>
                     </div>
-
-                    <div id="coordsTableContainer" style="margin-top: 20px; display: none; max-height: 300px; overflow-y: auto;">
-                        <h2>Radius Coordinates</h2>
-                        <div style="max-width: 800px; margin: auto;">
-                            <table border="1" style="width: 100%; text-align: left;">
-                                <thead>
-                                    <tr>
-                                        <th>Point</th>
-                                        <th>Latitude</th>
-                                        <th>Longitude</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="coordsData"></tbody>
-                            </table>
-                        </div>
+                    
+                    <!-- Right: Controls & Table -->
+                    <div id="controls" style="flex: 1; padding: 20px; background: #f4f4f4; overflow-y: auto;">
+                        <h2>Traffic Data Viewer</h2>
+                        <label>Enter Location: <input type="text" id="locationInput" placeholder="City, Address..."></label>
+                        <button id="searchLocation">Search</button>
+                        <br><br>
+                        <label>API Key: <input type="text" id="apiKeyInput" placeholder="Enter API Key"></label>
+                        <br><br>
+                        <label>Radius (km): <input type="number" id="radiusInput" value="1" min="0.1" step="0.1"></label>
+                        <br><br>
+                        <button id="getTrafficData">Get Traffic Data</button>
+                        <br><br>
+                        <table border="1" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>Location</th>
+                                    <th>Traffic Level</th>
+                                </tr>
+                            </thead>
+                            <tbody id="trafficTableBody">
+                                <tr><td colspan="2">No Data Available</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>`;
 
-            document.getElementById("loadMapBtn").addEventListener("click", page1.loadMap);
-            document.getElementById("updateRadiusBtn").addEventListener("click", page1.updateRadius);
+            page1.initMap();
+
+            document.getElementById("searchLocation").addEventListener("click", page1.searchLocation);
+            document.getElementById("getTrafficData").addEventListener("click", page1.getTrafficData);
         },
 
-        loadMap: function () {
-            document.getElementById("mapContainer").style.display = "block";
+        initMap: function () {
+            page1.map = L.map('map').setView([20.5937, 78.9629], 5); // Centered on India
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(page1.map);
 
-            var defaultLocation = [17.3850, 78.4867]; // Default Hyderabad
-            var map = L.map('map').setView(defaultLocation, 12);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
-
-            var marker = L.marker(defaultLocation, { draggable: true }).addTo(map);
-            var circle = L.circle(defaultLocation, { radius: page1.radiusKm * 1000 }).addTo(map);
-            page1.selectedLat = defaultLocation[0];
-            page1.selectedLng = defaultLocation[1];
-
-            document.getElementById("coordinates").innerText = `Latitude: ${page1.selectedLat}, Longitude: ${page1.selectedLng}`;
-            document.getElementById("coordsTableContainer").style.display = "block";
-            page1.updateTable();
-
-            map.on('click', function (event) {
-                marker.setLatLng(event.latlng);
-                circle.setLatLng(event.latlng);
-                page1.selectedLat = event.latlng.lat;
-                page1.selectedLng = event.latlng.lng;
-                document.getElementById("coordinates").innerText = `Latitude: ${page1.selectedLat}, Longitude: ${page1.selectedLng}`;
-                page1.updateTable();
+            page1.map.on('click', function (e) {
+                page1.selectedLat = e.latlng.lat;
+                page1.selectedLng = e.latlng.lng;
+                page1.updateMarker();
             });
         },
 
-        updateRadius: function () {
-            var newRadius = parseFloat(document.getElementById("radiusInput").value);
-            if (newRadius > 0) {
-                page1.radiusKm = newRadius;
-                page1.updateTable();
-            } else {
-                alert("Please enter a valid radius greater than 0.");
-            }
+        updateMarker: function () {
+            if (page1.marker) page1.map.removeLayer(page1.marker);
+            page1.marker = L.marker([page1.selectedLat, page1.selectedLng]).addTo(page1.map);
         },
 
-        updateTable: function () {
-            var numPoints = 8; // Number of points around the circle
-            var radiusMeters = page1.radiusKm * 1000;
-            var coordsTable = document.getElementById("coordsData");
-            coordsTable.innerHTML = "";
-
-            for (var i = 0; i < numPoints; i++) {
-                var angle = (i * 360) / numPoints; // Evenly distribute around circle
-                var newCoords = page1.computeOffset(page1.selectedLat, page1.selectedLng, radiusMeters, angle);
-                coordsTable.innerHTML += `<tr><td>Point ${i + 1}</td><td>${newCoords.lat}</td><td>${newCoords.lng}</td></tr>`;
+        searchLocation: function () {
+            var location = document.getElementById("locationInput").value;
+            if (!location) {
+                alert("Please enter a location.");
+                return;
             }
+            alert("Location search is not yet implemented. Use the map click instead.");
         },
 
-        computeOffset: function (lat, lng, distance, angle) {
-            var R = 6378137; // Earth's radius in meters
-            var dRad = distance / R;
-            var latRad = (lat * Math.PI) / 180;
-            var lngRad = (lng * Math.PI) / 180;
-            var angleRad = (angle * Math.PI) / 180;
+        getTrafficData: function () {
+            page1.apiKey = document.getElementById("apiKeyInput").value;
+            if (!page1.apiKey) {
+                alert("Please enter an API key.");
+                return;
+            }
 
-            var newLat = Math.asin(
-                Math.sin(latRad) * Math.cos(dRad) +
-                Math.cos(latRad) * Math.sin(dRad) * Math.cos(angleRad)
-            );
-            var newLng = lngRad + Math.atan2(
-                Math.sin(angleRad) * Math.sin(dRad) * Math.cos(latRad),
-                Math.cos(dRad) - Math.sin(latRad) * Math.sin(newLat)
-            );
+            if (!page1.selectedLat || !page1.selectedLng) {
+                alert("Please select a location on the map.");
+                return;
+            }
 
-            return {
-                lat: (newLat * 180) / Math.PI,
-                lng: (newLng * 180) / Math.PI
-            };
+            var radius = document.getElementById("radiusInput").value;
+            var url = `https://api.tomtom.com/traffic/services/4/flowSegmentData/relative0/10/json?point=${page1.selectedLat},${page1.selectedLng}&unit=KMPH&openLr=false&key=${page1.apiKey}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    page1.updateTrafficTable(data);
+                })
+                .catch(error => {
+                    alert("Failed to fetch traffic data. Please check your API key and internet connection.");
+                });
+        },
+
+        updateTrafficTable: function (data) {
+            var tableBody = document.getElementById("trafficTableBody");
+            tableBody.innerHTML = ""; // Clear existing data
+
+            if (!data || !data.flowSegmentData) {
+                tableBody.innerHTML = "<tr><td colspan='2'>No Traffic Data Available</td></tr>";
+                return;
+            }
+
+            var speedRatio = data.flowSegmentData.currentSpeed / data.flowSegmentData.freeFlowSpeed;
+            var trafficLevel = speedRatio > 0.8 ? "Low" : speedRatio > 0.5 ? "Moderate" : "High";
+
+            var row = `<tr><td>${data.flowSegmentData.frc}</td><td>${trafficLevel}</td></tr>`;
+            tableBody.innerHTML = row;
         }
     };
 
