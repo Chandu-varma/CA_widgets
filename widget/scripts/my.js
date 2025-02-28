@@ -16,15 +16,15 @@ define([
 
             widget.body.innerHTML = `
                 <div class="main-Container" id="mainContainer" 
-                    style="width: 100%; height: 100%; text-align: center; background-color:#005685; color: #ffffff; padding: 40px">
+                    style="width: 100%; height: 100%; text-align: center; background-color:#005685; color: #ffffff; padding: 20px; overflow: auto; max-height: 100vh;">
                     
                     <h1>Radius Coordinates Viewer</h1>
 
                     <button id="loadMapBtn">Load Map</button>
 
-                    <div id="mapContainer" style="margin-top: 20px; display: none;">
+                    <div id="mapContainer" style="margin-top: 20px; display: none; overflow: hidden;">
                         <h2>Select a Location</h2>
-                        <div id="map" style="height: 400px; width: 100%;"></div>
+                        <div id="map" style="height: 400px; width: 100%; max-width: 800px; margin: auto;"></div>
                         <p id="coordinates">Click on the map to select a location.</p>
 
                         <label for="radiusInput">Set Radius (km): </label>
@@ -32,18 +32,20 @@ define([
                         <button id="updateRadiusBtn">Update Radius</button>
                     </div>
 
-                    <div id="coordsTableContainer" style="margin-top: 20px; display: none;">
+                    <div id="coordsTableContainer" style="margin-top: 20px; display: none; max-height: 300px; overflow-y: auto;">
                         <h2>Radius Coordinates</h2>
-                        <table border="1" style="width: 100%; text-align: left;">
-                            <thead>
-                                <tr>
-                                    <th>Point</th>
-                                    <th>Latitude</th>
-                                    <th>Longitude</th>
-                                </tr>
-                            </thead>
-                            <tbody id="coordsData"></tbody>
-                        </table>
+                        <div style="max-width: 800px; margin: auto;">
+                            <table border="1" style="width: 100%; text-align: left;">
+                                <thead>
+                                    <tr>
+                                        <th>Point</th>
+                                        <th>Latitude</th>
+                                        <th>Longitude</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="coordsData"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>`;
 
