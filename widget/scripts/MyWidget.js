@@ -15,30 +15,31 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
                         color: #fff; border: none; border-radius: 5px; cursor: pointer;">
                         Load Table
                     </button><br><br>
-<buttonid="drop" style="margin-top: 20px; padding: 10px 20px; background-color: #28a745>drop here</button>
+
+                    <!-- Corrected Drop Button -->
+                    <button id="drop" 
+                        style="margin-top: 20px; padding: 10px 20px; background-color: #28a745; 
+                        color: #fff; border: none; border-radius: 5px; cursor: pointer;">
+                        Drop Here
+                    </button>
+
                     <div id="tableContainer" style="margin-top: 20px;"></div>
                 </div>`;
 
-            // Add event listener to button to call TableWidget.js
+            // Add event listeners
             document.getElementById("loadTableBtn").addEventListener("click", tableModule.generateTable);
             document.getElementById("drop").addEventListener("click", page1.drop);
         },
 
-
         drop: function () {
             var area = document.querySelector("#drop");
             dragDrop.droppable(area, {
-                function(data) {
-                    alert(data);
-                },
-            },);
-
+                drop: function (data) { // Corrected function usage
+                    alert("Dropped Data: " + JSON.stringify(data));
+                }
+            });
         },
-
     };
 
     widget.addEvent("onLoad", page1.onLoad);
-
-
-
 });
