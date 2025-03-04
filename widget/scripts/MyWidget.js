@@ -45,6 +45,8 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
                 // onchange: "onPlatformIdChange"
             };
             widget.addPreference(structure);
+            widget.addPreference(structure);
+            widget.addPreference(structure);
         },
 
         drop: function () {
