@@ -33,8 +33,8 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
                 </div>`;
 
             // Add event listeners
-
-            widget.addPreferences(structure);
+            // widget.addPreference(platformidPreference);
+            widget.addPreference(structure);
             document.getElementById("loadTableBtn").addEventListener("click", tableModule.generateTable);
             document.getElementById("drop").addEventListener("click", page1.drop);
         },
