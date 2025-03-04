@@ -28,7 +28,7 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
 
             // Add event listeners
             // widget.addPreference(platformidPreference);
-            page1.addpref();
+            // page1.addpref();
             document.getElementById("loadTableBtn").addEventListener("click", tableModule.generateTable);
             document.getElementById("drop").addEventListener("click", page1.drop);
 
