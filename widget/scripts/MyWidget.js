@@ -44,9 +44,17 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
                 // options: ["a", "B", "c"],
                 // onchange: "onPlatformIdChange"
             };
+            var structure1 = {
+                name: "name",
+                type: "list",
+                label: "sample",
+
+                options: ["a", "B", "c"],
+                // onchange: "onPlatformIdChange"
+            };
             widget.addPreference(structure);
-            widget.addPreference(structure);
-            widget.addPreference(structure);
+            widget.addPreference(structure1);
+            widget.addPreference(structure1);
         },
 
         drop: function () {
