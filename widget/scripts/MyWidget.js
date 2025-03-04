@@ -1,6 +1,12 @@
 define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataDragAndDrop/DataDragAndDrop"], function (tableModule, dragDrop) {
     'use strict';
-
+    var structure = {
+        name: "platformid",
+        type: "list",
+        label: CAAWebAppsUPDyn.get("PlatformId_lbl"),
+        options: [],
+        onchange: "onPlatformIdChange"
+    };
     var page1 = {
         onLoad: function () {
             widget.body.innerHTML = `
@@ -27,6 +33,8 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
                 </div>`;
 
             // Add event listeners
+
+            widget.addPreferences(structure);
             document.getElementById("loadTableBtn").addEventListener("click", tableModule.generateTable);
             document.getElementById("drop").addEventListener("click", page1.drop);
         },
