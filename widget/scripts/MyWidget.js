@@ -40,9 +40,9 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
                 name: "name",
                 type: "text",
                 label: "sample",
-                // label: "hiii",
-                // options: ["a", "B", "c"],
-                // onchange: "onPlatformIdChange"
+                label: "hiii",
+                options: ["a", "B", "c"],
+                onchange: "onPlatformIdChange"
             };
             widget.addPreference(structure);
             widget.addPreference(structure);
