@@ -28,7 +28,7 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
 
             // Add event listeners
             // widget.addPreference(platformidPreference);
-            widget.addPreference(structure);
+            // widget.addPreference(structure);
             document.getElementById("loadTableBtn").addEventListener("click", tableModule.generateTable);
             document.getElementById("drop").addEventListener("click", page1.drop);
 
@@ -37,7 +37,7 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
                 type: "list",
                 label: "CME WEB",
                 // label: CAAWebAppsUPDyn.get("PlatformId_lbl"),
-                options: [],
+                options: ["a", "B", "c"],
                 // onchange: "onPlatformIdChange"
             };
         },
@@ -46,7 +46,7 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
             var area = document.querySelector("#drop");
             dragDrop.droppable(area, {
                 drop: function (data) { // Corrected function usage
-                    alert("Dropped Data: " + JSON.stringify(data));
+                    alert(data);
                 }
             });
         },
