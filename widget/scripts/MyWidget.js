@@ -16,7 +16,7 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
                         Load Table
                     </button><br><br>
 
-                    <!-- Corrected Drop Button -->
+                    <!-- Drop Button -->
                     <button id="drop" 
                         style="margin-top: 20px; padding: 10px 20px; background-color: #28a745; 
                         color: #fff; border: none; border-radius: 5px; cursor: pointer;">
@@ -26,42 +26,40 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
                     <div id="tableContainer" style="margin-top: 20px;"></div>
                 </div>`;
 
-            // Add event listeners
-            // widget.addPreference(platformidPreference);
-            // page1.addpref();
+            // Add user preferences
+            page1.addPreferences();
+
+            // Attach event listeners
             document.getElementById("loadTableBtn").addEventListener("click", tableModule.generateTable);
             document.getElementById("drop").addEventListener("click", page1.drop);
-
-
         },
 
-        addpref: function () {
-            var structure = {
-                name: "name",
+        addPreferences: function () {
+            var textPreference = {
+                name: "username",  // Unique name
                 type: "text",
-                label: "sample",
-
-                // options: ["a", "B", "c"],
-                // onchange: "onPlatformIdChange"
+                label: "User Name",
+                defaultValue: ""
             };
-            var structure1 = {
-                name: "name",
+
+            var listPreference = {
+                name: "category",  // Unique name
                 type: "list",
-                label: "sample",
-
+                label: "Category",
                 options: ["a", "B", "c"],
-                // onchange: "onPlatformIdChange"
+                defaultValue: "a"  // Must match one of the options
             };
-            widget.addPreference(structure);
-            widget.addPreference(structure1);
-            widget.addPreference(structure1);
+
+            // Add preferences to the widget
+            widget.addPreference(textPreference);
+            widget.addPreference(listPreference);
         },
 
         drop: function () {
             var area = document.querySelector("#drop");
             dragDrop.droppable(area, {
-                drop: function (data) { // Corrected function usage
-                    alert(data);
+                drop: function (data) {
+                    alert("Dropped Data: " + JSON.stringify(data)); // Ensure data is properly handled
                 }
             });
         },
