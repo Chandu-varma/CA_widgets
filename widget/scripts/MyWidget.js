@@ -3,6 +3,7 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
     var structure = {
         name: "platformid",
         type: "list",
+        label: "CME WEB",
         // label: CAAWebAppsUPDyn.get("PlatformId_lbl"),
         options: [],
         // onchange: "onPlatformIdChange"
