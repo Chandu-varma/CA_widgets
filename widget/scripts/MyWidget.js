@@ -37,11 +37,11 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
 
         addpref: function () {
             var structure = {
-                name: "platformid",
-                type: "list",
-                label: "CME WEB",
-                label: "hiii",
-                options: ["a", "B", "c"],
+                name: "name",
+                type: "text",
+                label: "sample",
+                // label: "hiii",
+                // options: ["a", "B", "c"],
                 // onchange: "onPlatformIdChange"
             };
             widget.addPreference(structure);
