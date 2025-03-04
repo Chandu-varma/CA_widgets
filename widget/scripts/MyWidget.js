@@ -40,7 +40,7 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
                 name: "name",
                 type: "text",
                 label: "sample",
-                label: "hiii",
+
                 options: ["a", "B", "c"],
                 onchange: "onPlatformIdChange"
             };
