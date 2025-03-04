@@ -40,7 +40,7 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
                 name: "platformid",
                 type: "list",
                 label: "CME WEB",
-                // label: CAAWebAppsUPDyn.get("PlatformId_lbl"),
+                label: "hiii",
                 options: ["a", "B", "c"],
                 // onchange: "onPlatformIdChange"
             };
