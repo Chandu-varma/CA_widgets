@@ -28,10 +28,14 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
 
             // Add event listeners
             // widget.addPreference(platformidPreference);
-            // widget.addPreference(structure);
+            page1.addpref();
             document.getElementById("loadTableBtn").addEventListener("click", tableModule.generateTable);
             document.getElementById("drop").addEventListener("click", page1.drop);
 
+
+        },
+
+        addpref: function () {
             var structure = {
                 name: "platformid",
                 type: "list",
@@ -40,6 +44,7 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
                 options: ["a", "B", "c"],
                 // onchange: "onPlatformIdChange"
             };
+            widget.addPreference(structure);
         },
 
         drop: function () {
