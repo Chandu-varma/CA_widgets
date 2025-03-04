@@ -3,9 +3,9 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
     var structure = {
         name: "platformid",
         type: "list",
-        label: CAAWebAppsUPDyn.get("PlatformId_lbl"),
+        // label: CAAWebAppsUPDyn.get("PlatformId_lbl"),
         options: [],
-        onchange: "onPlatformIdChange"
+        // onchange: "onPlatformIdChange"
     };
     var page1 = {
         onLoad: function () {
