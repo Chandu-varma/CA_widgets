@@ -16,17 +16,18 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
                         Load Table
                     </button><br><br>
 
-                    <!-- Drop Button -->
-                    <button id="dropArea" 
-                        style="margin-top: 20px; padding: 10px 20px; background-color: #dc3545; 
-                        color: #fff; border: none; border-radius: 5px; cursor: pointer;">
+                    <!-- Drop Area -->
+                    <div id="dropArea" 
+                        style="margin-top: 20px; padding: 20px; width: 200px; height: 100px; 
+                        background-color: #dc3545; color: white; border-radius: 5px; 
+                        display: flex; align-items: center; justify-content: center; cursor: pointer;">
                         Drop Here
-                    </button>
+                    </div>
 
                     <div id="tableContainer" style="margin-top: 20px; background: #ffffff; color: black; padding: 10px;"></div>
                 </div>`;
 
-            // Initialize user preferences
+            // Add user preferences
             page1.addPreferences();
 
             // Attach event listeners after the DOM is loaded
@@ -75,7 +76,7 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
                 return;
             }
 
-            // Generate a sample table
+            // Generate a sample table with draggable rows
             tableContainer.innerHTML = `
                 <table border="1" width="100%" style="border-collapse: collapse;">
                     <thead>
@@ -85,15 +86,15 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
                         </tr>
                     </thead>
                     <tbody>
-                        <tr draggable="true">
+                        <tr draggable="true" ondragstart="page1.drag(event)" data-id="1">
                             <td>1</td>
                             <td>Item A</td>
                         </tr>
-                        <tr draggable="true">
+                        <tr draggable="true" ondragstart="page1.drag(event)" data-id="2">
                             <td>2</td>
                             <td>Item B</td>
                         </tr>
-                        <tr draggable="true">
+                        <tr draggable="true" ondragstart="page1.drag(event)" data-id="3">
                             <td>3</td>
                             <td>Item C</td>
                         </tr>
@@ -103,12 +104,22 @@ define("DS/widget/scripts/MyWidget", ["DS/widget/scripts/TableWidget", "DS/DataD
             console.log("Table Loaded Successfully!");
         },
 
+        drag: function (event) {
+            var data = event.target.getAttribute("data-id");  // Capture row data
+            event.dataTransfer.setData("text/plain", data);   // Store data in drag event
+            console.log("Dragging item:", data);
+        },
+
         setupDrop: function (dropArea) {
-            dragDrop.droppable(dropArea, {
-                drop: function (data) {
-                    console.log("Data Dropped: ", data);
-                    alert("Dropped Data: " + JSON.stringify(data));
-                }
+            dropArea.addEventListener("dragover", function (event) {
+                event.preventDefault();  // Allow drop
+            });
+
+            dropArea.addEventListener("drop", function (event) {
+                event.preventDefault();
+                var data = event.dataTransfer.getData("text/plain");
+                alert("Dropped Data: " + data);
+                console.log("Dropped Data:", data);
             });
         }
     };
