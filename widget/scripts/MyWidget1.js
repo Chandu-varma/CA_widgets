@@ -1,90 +1,75 @@
-define(["DS/widget/scripts/MyWidget1", "DS/DataDragAndDrop/DataDragAndDrop"], function (dragDrop) {
+define(["DS/widget/scripts/MyWidget", "DS/widget/scripts/data"], function (myWidget, dataModule) {
     'use strict';
 
     var page1 = {
         onLoad: function () {
             widget.body.innerHTML = `
-                <div id="mainContainer" style="padding: 20px; background-color: #f4f4f4; color: #333;">
-                    <h2>Data Table</h2>
+                <div class="main-Container" id="mainContainer" 
+                    style="width: 100%; height: 100%; text-align: center; background-color:#005685; color: #ffffff; padding: 40px">
                     
-                    <button id="addBtn" 
-                        style="margin-bottom: 10px; padding: 8px 16px; background-color: #007bff; 
-                        color: white; border: none; border-radius: 4px; cursor: pointer;">
-                        Add
-                    </button>
+                    <h1>Load BOM Table</h1>
+                    
+                    <!-- Button to Load Table -->
+                    <button id="loadTableBtn" 
+                        style="margin-top: 20px; padding: 10px 20px; background-color: #28a745; 
+                        color: #fff; border: none; border-radius: 5px; cursor: pointer;">
+                        Load Table
+                    </button><br><br>
 
-                    <table id="dataTable" border="1" width="100%" style="border-collapse: collapse; background: white;">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Rows will be inserted here -->
-                        </tbody>
-                    </table>
-                </div>
-            `;
+                    <div id="tableContainer" style="margin-top: 20px; background: #ffffff; color: black; padding: 10px;"></div>
+                </div>`;
 
-            var addBtn = document.getElementById("addBtn");
-            if (addBtn) {
-                addBtn.addEventListener("click", page1.fetchWebServiceData);
+            var loadTableBtn = document.getElementById("loadTableBtn");
+
+            if (loadTableBtn) {
+                loadTableBtn.addEventListener("click", page1.loadTable);
+            } else {
+                console.error("Load Table button not found!");
             }
         },
 
-        fetchWebServiceData: async function () {
-            try {
-                const response = await fetch("https://skyronerp.onrender.com/api/bom/", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2UzYTdmMGY0MjkyYjA4N2YwYTQ4YzgiLCJlbWFpbCI6InZhbXNpbWFuaWtvbmRhNjg4NUBnbWFpbC5jb20iLCJpYXQiOjE3NDQxMTUxMzksImV4cCI6MTc0NDExODczOX0.la4_PBe9zjFO4aQ5ZOrIQkBp2bpHLhYDr5CTP8UzG7c"
-                    }
-                });
+        loadTable: function () {
+            var tableContainer = document.getElementById("tableContainer");
 
-                const data = await response.json();
-
-                if (data && Array.isArray(data.bomData)) {
-                    data.bomData.forEach(page1.addRowToTable);
-                } else {
-                    console.error("Invalid data format", data);
-                }
-            } catch (error) {
-                console.error("Error fetching BOM data:", error);
+            if (!tableContainer) {
+                console.error("Table container not found!");
+                return;
             }
-        },
 
-        addRowToTable: function (parentData) {
-            const tbody = document.querySelector("#dataTable tbody");
+            const bomData = dataModule.fetchBOMData(); // Fetch BOM data from the module
 
-            const parentId = parentData._id;
-            const parentRow = document.createElement("tr");
-            parentRow.setAttribute("style", "cursor: pointer; background-color: #e6f7ff;");
-            parentRow.innerHTML = `
-                <td>${parentData.parent_part}</td>
-                <td>${parentData.name}</td>
-            `;
-            parentRow.addEventListener("click", function () {
-                const childRows = document.querySelectorAll(`.child-of-${parentId}`);
-                childRows.forEach(row => {
-                    row.style.display = row.style.display === "none" ? "table-row" : "none";
-                });
+            let html = `
+                <table border="1" width="100%" style="border-collapse: collapse;">
+                    <thead>
+                        <tr style="background-color: #ddd;">
+                            <th>Parent Part</th>
+                            <th>Title</th>
+                            <th>Revision</th>
+                            <th>Type</th>
+                            <th>Owner</th>
+                            <th>Description</th>
+                            <th>Children Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            bomData.forEach(item => {
+                html += `
+                    <tr>
+                        <td>${item.parent_part}</td>
+                        <td>${item.title}</td>
+                        <td>${item.revision}</td>
+                        <td>${item.type}</td>
+                        <td>${item.owner}</td>
+                        <td>${item.description}</td>
+                        <td>${item.children.length}</td>
+                    </tr>`;
             });
 
-            tbody.appendChild(parentRow);
+            html += `</tbody></table>`;
+            tableContainer.innerHTML = html;
 
-            parentData.children.forEach(child => {
-                const childRow = document.createElement("tr");
-                childRow.classList.add(`child-of-${parentId}`);
-                childRow.style.display = "none";
-                childRow.style.backgroundColor = "#f9f9f9";
-                childRow.innerHTML = `
-                    <td>${child.part}</td>
-                    <td>${child.name}</td>
-                `;
-                tbody.appendChild(childRow);
-            });
+            console.log("BOM Table Loaded Successfully!");
         }
     };
 
