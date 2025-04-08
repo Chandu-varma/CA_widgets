@@ -1,4 +1,4 @@
-require("DS/widget/scripts/MyWidget", ['DS/DataDragAndDrop/DataDragAndDrop'],
+require("DS/widget/scripts/my", ['DS/DataDragAndDrop/DataDragAndDrop'],
     function (DataDragAndDrop) {
         'use strict';
 
