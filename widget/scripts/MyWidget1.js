@@ -1,4 +1,4 @@
-define(["DS/widget/scripts/MyWidget1","DS/DataDragAndDrop/DataDragAndDrop"], function (dragDrop) {
+define(["DS/widget/scripts/MyWidget1", "DS/DataDragAndDrop/DataDragAndDrop"], function (dragDrop) {
     'use strict';
 
     var page1 = {
@@ -27,37 +27,64 @@ define(["DS/widget/scripts/MyWidget1","DS/DataDragAndDrop/DataDragAndDrop"], fun
                 </div>
             `;
 
-            // Set up the Add button
             var addBtn = document.getElementById("addBtn");
             if (addBtn) {
                 addBtn.addEventListener("click", page1.fetchWebServiceData);
             }
         },
 
-        fetchWebServiceData: function () {
-            // Dummy web service call simulation
-            // Replace this with actual fetch or XMLHttpRequest to your service
-            console.log("Calling web service...");
+        fetchWebServiceData: async function () {
+            try {
+                const response = await fetch("https://skyronerp.onrender.com/api/bom/", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2UzYTdmMGY0MjkyYjA4N2YwYTQ4YzgiLCJlbWFpbCI6InZhbXNpbWFuaWtvbmRhNjg4NUBnbWFpbC5jb20iLCJpYXQiOjE3NDQxMTUxMzksImV4cCI6MTc0NDExODczOX0.la4_PBe9zjFO4aQ5ZOrIQkBp2bpHLhYDr5CTP8UzG7c"
+                    }
+                });
 
-            // Simulated response data
-            const responseData = {
-                id: Math.floor(Math.random() * 1000),
-                name: "Item " + String.fromCharCode(65 + Math.floor(Math.random() * 26))
-            };
+                const data = await response.json();
 
-            page1.addRowToTable(responseData);
+                if (data && Array.isArray(data.bomData)) {
+                    data.bomData.forEach(page1.addRowToTable);
+                } else {
+                    console.error("Invalid data format", data);
+                }
+            } catch (error) {
+                console.error("Error fetching BOM data:", error);
+            }
         },
 
-        addRowToTable: function (data) {
+        addRowToTable: function (parentData) {
             const tbody = document.querySelector("#dataTable tbody");
 
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${data.id}</td>
-                <td>${data.name}</td>
+            const parentId = parentData._id;
+            const parentRow = document.createElement("tr");
+            parentRow.setAttribute("style", "cursor: pointer; background-color: #e6f7ff;");
+            parentRow.innerHTML = `
+                <td>${parentData.parent_part}</td>
+                <td>${parentData.name}</td>
             `;
+            parentRow.addEventListener("click", function () {
+                const childRows = document.querySelectorAll(`.child-of-${parentId}`);
+                childRows.forEach(row => {
+                    row.style.display = row.style.display === "none" ? "table-row" : "none";
+                });
+            });
 
-            tbody.appendChild(row);
+            tbody.appendChild(parentRow);
+
+            parentData.children.forEach(child => {
+                const childRow = document.createElement("tr");
+                childRow.classList.add(`child-of-${parentId}`);
+                childRow.style.display = "none";
+                childRow.style.backgroundColor = "#f9f9f9";
+                childRow.innerHTML = `
+                    <td>${child.part}</td>
+                    <td>${child.name}</td>
+                `;
+                tbody.appendChild(childRow);
+            });
         }
     };
 
